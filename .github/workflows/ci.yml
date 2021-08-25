@@ -2,7 +2,7 @@ name: Integration
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [ master ]
 jobs:
   build_and_upload_artifact_for_macos_and_linux:
     strategy:
