@@ -65,11 +65,11 @@ jobs:
       - name: Build nng
         shell: bash
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release
+          cmake -B build
+          cmake --build build
       - name: Test nng
         run: |
-          ctest -C Release --output-on-failure
+          ctest -C Debug --output-on-failure
         working-directory: build
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
