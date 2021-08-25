@@ -21,12 +21,12 @@ jobs:
           ..
           ninja
       - name: Test
-        run: ctest --output-on-
+        run: ctest --output-on-failure
         working-directory: build
       - name: upload build artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: nng-${{ matrix.config.name }}
+          name: nng-linux
           path: |
             build/libnng.a
             include/
@@ -47,12 +47,12 @@ jobs:
           ..
           ninja
       - name: Test
-        run: ctest --output-on-
+        run: ctest --output-on-failure
         working-directory: build
       - name: upload build artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: nng-${{ matrix.config.name }}
+          name: nng-macos
           path: |
             build/libnng.a
             include/
