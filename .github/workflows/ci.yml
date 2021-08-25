@@ -76,5 +76,5 @@ jobs:
         with:
           name: nng-macos
           path: |
-            build/Release/nng.lib
+            build/Debug/nng.lib
             include/
