@@ -1,0 +1,37 @@
+name: Integration
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+jobs:
+  build_and_upload_artifact_for_macos_and_linux:
+    strategy:
+      matrix:
+        config:
+        - { os: ubuntu-latest, name: 'linux'}
+        - { os: macos-latest, name: 'macos'}
+    runs-on: ${{ matrix.config.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: |
+          sudo apt-get install -y  libmbedtls-dev ninja-build
+      - name: Build nng
+        run: |
+          mkdir build
+          cd build
+          cmake -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DNNG_ENABLE_TLS=ON \
+          ..
+          ninja
+      - name: Test
+        run: ctest --output-on-
+        working-directory: build
+      - name: upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: nng-${{ matrix.config.name }}
+          path: |
+            build/libnng.a
+            include/
