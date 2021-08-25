@@ -13,9 +13,14 @@ jobs:
     runs-on: ${{ matrix.config.os }}
     steps:
       - uses: actions/checkout@v2
-      - name: Install Dependencies
+      - name: Install Dependencies for linux
+        if: ${{ matrix.config.name }} == 'linux'
         run: |
           sudo apt-get install -y  libmbedtls-dev ninja-build
+      - name: Install Dependencies for linux
+        if: ${{ matrix.config.name }} == 'macos'
+        run: |
+          brew install mbedtl ninja
       - name: Build nng
         run: |
           mkdir build
