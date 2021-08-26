@@ -1,10 +1,10 @@
-name: Integration
+name: Release
 on:
-  pull_request:
   push:
-    branches: [ master ]
+    tags:
+      - 'v*'
 jobs:
-  build_and_upload_artifact_for_linux:
+  build_and_upload_for_linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -17,6 +17,7 @@ jobs:
           cd build
           cmake -G Ninja \
           -DNNG_ENABLE_TLS=ON \
+          -DCMAKE_BUILD_TYPE=Release \
           ..
           ninja
       - name: Test nng
@@ -29,11 +30,11 @@ jobs:
           path: |
             build/libnng.a
             include/
-  build_and_upload_artifact_for_macos:
+  build_and_upload_for_macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Dependencies for macos
+      - name: Install Dependencies for linux
         run: |
           brew install mbedtls ninja
       - name: Build nng
@@ -42,6 +43,7 @@ jobs:
           cd build
           cmake -G Ninja \
           -DNNG_ENABLE_TLS=ON \
+          -DCMAKE_BUILD_TYPE=Release \
           ..
           ninja
       - name: Test nng
@@ -54,7 +56,7 @@ jobs:
           path: |
             build/libnng.a
             include/
-  build_and_upload_artifact_for_windows:
+  build_and_upload_for_windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -63,16 +65,36 @@ jobs:
       - name: Build nng
         shell: bash
         run: |
-          cmake -B build
-          cmake --build build
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
       - name: Test nng
         run: |
-          ctest -C Debug --output-on-failure
+          ctest -C Release --output-on-failure
         working-directory: build
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: nng-win
           path: |
-            build/Debug/nng.lib
+            build/Release/nng.lib
             include/
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [build_and_upload_for_linux,build_and_upload_for_macos,build_and_upload_for_windows]
+    steps:
+      - name: Download all nng artifacts
+        uses: actions/download-artifact@v2
+      - name: Repackage as release artifacts
+        run: |
+          mkdir artifacts/
+          tar czf artifacts/nng-linux.tar.gz -C nng-linux/ $(find nng-linux -type f -name "*.a" -exec basename {} \;)
+          tar czf artifacts/nng-macos.tar.gz -C nng-macos/ $(find nng-macos -type f -name "*.a" -exec basename {} \;)
+          tar czf artifacts/nng-win.tar.gz -C nng-win/ $(find nng-win -type f -name "*.lib" -exec basename {} \;)
+          tar czf artifacts/nng-headers.tar.gz -C nng-linux/ nng-linux/include/
+      - name: Create release on GitHub
+        uses: softprops/action-gh-release@v0.1.12
+        with:
+          name: nng
+          files: |
+            artifacts/*.*
