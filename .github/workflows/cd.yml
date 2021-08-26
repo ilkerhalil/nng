@@ -88,10 +88,10 @@ jobs:
       - name: Repackage as release artifacts
         run: |
           mkdir artifacts/
-          tar czf artifacts/nng-linux.tar.gz -C nng-linux/ $(find nng-linux -type f -name "*.a" -exec basename {} \;)
-          tar czf artifacts/nng-macos.tar.gz -C nng-macos/ $(find nng-macos -type f -name "*.a" -exec basename {} \;)
-          tar czf artifacts/nng-win.tar.gz -C nng-win/ $(find nng-win -type f -name "*.lib" -exec basename {} \;)
-          tar czf artifacts/nng-headers.tar.gz -C nng-linux/ nng-linux/include/
+          tar czf artifacts/nng-linux.tar.gz -C nng-linux/ $(find nng-linux/build -type f -name "*.a" -exec basename {} \;)
+          tar czf artifacts/nng-macos.tar.gz -C nng-macos/ $(find nng-macos/build -type f -name "*.a" -exec basename {} \;)
+          tar czf artifacts/nng-win.tar.gz -C nng-win/ $(find nng-win/build/release -type f -name "*.lib" -exec basename {} \;)
+          tar czf artifacts/nng-headers.tar.gz -C nng-linux/ nng-linux/include/nng
       - name: Create release on GitHub
         uses: softprops/action-gh-release@v0.1.12
         with:
