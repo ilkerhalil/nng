@@ -1,0 +1,39 @@
+name: Sync with Upstream
+on:
+  schedule:
+    - cron:  '0 7 * * 1,4'
+  workflow_dispatch:
+jobs:
+  sync_with_upstream:
+    runs-on: ubuntu-latest
+    name: Sync with Upstream
+    steps:
+    - name: Checkout master branch
+      uses: actions/checkout@v2
+      with:
+        ref: master
+    - name: Pull upstream changes
+      id: sync
+      uses: aormsby/Fork-Sync-With-Upstream-action@v2.3
+      with:
+        upstream_repository: nanomsg/nng
+        upstream_branch: master
+        target_branch: master
+        git_pull_args: '--unshallow'
+        github_token: ${{ github.token }}
+    - name: Create Date Variable
+      id: date
+      run: echo "::set-output name=today::$(date +'%Y-%m-%d')"
+    - name: Create Pull Request
+      if: steps.sync.outputs.has_new_commits
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token:  ${{ github.token }}
+        title: 'Upstream changes in nng, ${{ steps.date.outputs.today }}'
+        branch: check-nng-upstream-${{ steps.date.outputs.today }}
+        body: |
+          Please check changes from upstream nng master branch.
+        labels: |
+          automated-pr
+          nng
+          upstream
