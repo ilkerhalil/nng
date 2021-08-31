@@ -17,7 +17,7 @@ jobs:
           repo: "ilkerhalil/mbedtls"
           version: "tags/v3.0.9"
           file: "mbedtls-linux.tar.gz"
-          target: "/tmp/mbedtls-linux.tar.gz"
+          target: "mbedtls-linux.tar.gz"
           token: ${{ github.token }}
       - name: Download mbedtls Headers
         uses: dsaltares/fetch-gh-release-asset@master
@@ -25,13 +25,13 @@ jobs:
           repo: "ilkerhalil/mbedtls"
           version: "tags/v3.0.9"
           file: "mbedtls-headers.tar.gz"
-          target: "/tmp/mbedtls-headers.tar.gz"
+          target: "mbedtls-headers.tar.gz"
           token: ${{ github.token }}
       - name: Extract mbedtls
         run: |
           mkdir -p /tmp/mbedtls
-          tar -xvf /tmp/mbedtls-headers.tar.gz -C /tmp/mbedtls
-          tar -xvf /tmp/mbedtls-linux.tar.gz -C /tmp/mbedtls
+          tar -xvf mbedtls-headers.tar.gz -C /tmp/mbedtls
+          tar -xvf mbedtls-linux.tar.gz -C /tmp/mbedtls
       - name: Build nng with tls
         run: |
           mkdir build
