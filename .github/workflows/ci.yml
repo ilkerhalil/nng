@@ -30,8 +30,8 @@ jobs:
       - name: Extract mbedtls
         run: |
           mkdir -p /tmp/mbedtls
-          tar -xvf mbedtls-headers.tar.gz -C /tmp/mbedtls
-          tar -xvf mbedtls-linux.tar.gz -C /tmp/mbedtls
+          tar -xvf /tmp/mbedtls-headers.tar.gz -C /tmp/mbedtls
+          tar -xvf /tmp/mbedtls-linux.tar.gz -C /tmp/mbedtls
       - name: Build nng with tls
         run: |
           mkdir build
@@ -40,7 +40,7 @@ jobs:
           -DNNG_ENABLE_TLS=ON \
           -DCMAKE_BUILD_TYPE=Release \
           -DNNG_ELIDE_DEPRECATED=ON \
-          -DMBEDTLS_ROOT_DIR/tmp/mbedtls \
+          -DMBEDTLS_ROOT_DIR=/tmp/mbedtls \
           ..
           cmake --build . --config Release
       - name: Test nng with tls
@@ -50,6 +50,7 @@ jobs:
         run: |
           mkdir -p nng-linux-with-tls
           cp build/libnng.so* nng-linux-with-tls
+          rm -rf build
       - name: Build nng
         run: |
           mkdir build
