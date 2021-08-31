@@ -4,7 +4,8 @@ on:
   push:
     branches: [ master ]
 jobs:
-  build_and_upload_artifact_for_linux:
+  build_and_upload_artifact_for_linux_with_tls:
+    name: Build and Upload Artifact for linux with tls
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -40,17 +41,27 @@ jobs:
           -DNNG_ENABLE_TLS=ON \
           -DCMAKE_BUILD_TYPE=Release \
           -DNNG_ELIDE_DEPRECATED=ON \
+          -DNNG_TOOLS=OFF \
           -DMBEDTLS_ROOT_DIR=/tmp/mbedtls \
           ..
           cmake --build . --config Release
       - name: Test nng with tls
-        run: ctest --output-on-failure
+        run: ctest --output-on-failure -C "Release"
         working-directory: build
       - name: Create Artifact For nng with tls
         run: |
-          mkdir -p nng-linux-with-tls
-          cp build/libnng.so* nng-linux-with-tls
-          rm -rf build
+          mkdir -p nng-linux
+          cp build/libnng.so nng-linux
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: nng-linux-with-tls
+          path: |
+            nng-linux/
+  build_and_upload_artifact_for_linux:
+    name: Build and Upload Artifact for linux
+    runs-on: ubuntu-latest
+    steps:
       - name: Build nng
         run: |
           mkdir build
@@ -58,47 +69,128 @@ jobs:
           cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON \
           -DCMAKE_BUILD_TYPE=Release \
           -DNNG_ELIDE_DEPRECATED=ON \
+          -DNNG_TOOLS=OFF \
           ..
           cmake --build . --config Release
       - name: Test nng
-        run: ctest --output-on-failure
+        run: ctest --output-on-failure -C "Release"
         working-directory: build
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-linux
-          cp build/libnng.so* nng-linux
+          cp build/libnng.so nng-linux
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: nng-linux
           path: |
-            nng-linux-with-tls/
             nng-linux/
-  build_and_upload_artifact_for_macos:
+  build_and_upload_artifact_for_macos_with_tls:
+    name: Build and Upload Artifact for macos with tls
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install Dependencies for macos
         run: |
-          brew install mbedtls ninja
+          brew install ninja
+      - name: Download mbedtls Linux Release
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "ilkerhalil/mbedtls"
+          version: "tags/v3.0.9"
+          file: "mbedtls-macos.tar.gz"
+          target: "mbedtls-macos.tar.gz"
+          token: ${{ github.token }}
+      - name: Download mbedtls Headers
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "ilkerhalil/mbedtls"
+          version: "tags/v3.0.9"
+          file: "mbedtls-headers.tar.gz"
+          target: "mbedtls-headers.tar.gz"
+          token: ${{ github.token }}
+      - name: Extract mbedtls
+        run: |
+          mkdir -p /tmp/mbedtls
+          tar -xvf mbedtls-headers.tar.gz -C /tmp/mbedtls
+          tar -xvf mbedtls-macos.tar.gz -C /tmp/mbedtls
+      - name: Build nng with tls
+        run: |
+          mkdir build
+          cd build
+          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON \
+          -DNNG_ENABLE_TLS=ON \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DNNG_ELIDE_DEPRECATED=ON \
+          -DNNG_TOOLS=OFF \
+          -DMBEDTLS_ROOT_DIR=/tmp/mbedtls \
+          ..
+          cmake --build . --config Release
+      - name: Test nng with tls
+        run: ctest --output-on-failure -C "Release"
+        working-directory: build
+      - name: Create Artifact For nng with tls
+        run: |
+          mkdir -p nng-macos
+          cp build/libnng.so nng-macos
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: nng-macos-with-tls
+          path: |
+            nng-macos/
+  build_and_upload_artifact_for_macos:
+    name: Build and Upload Artifact for macos
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies for macos
+        run: |
+          brew install ninja
+      - name: Download mbedtls Linux Release
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "ilkerhalil/mbedtls"
+          version: "tags/v3.0.9"
+          file: "mbedtls-macos.tar.gz"
+          target: "mbedtls-macos.tar.gz"
+          token: ${{ github.token }}
+      - name: Download mbedtls Headers
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "ilkerhalil/mbedtls"
+          version: "tags/v3.0.9"
+          file: "mbedtls-headers.tar.gz"
+          target: "mbedtls-headers.tar.gz"
+          token: ${{ github.token }}
+      - name: Extract mbedtls
+        run: |
+          mkdir -p /tmp/mbedtls
+          tar -xvf mbedtls-headers.tar.gz -C /tmp/mbedtls
+          tar -xvf mbedtls-macos.tar.gz -C /tmp/mbedtls
       - name: Build nng
         run: |
           mkdir build
           cd build
-          cmake -G Ninja \
-          -DNNG_ENABLE_TLS=ON \
+          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DNNG_ELIDE_DEPRECATED=ON \
+          -DNNG_TOOLS=OFF \
           ..
-          ninja
+          cmake --build . --config Release
       - name: Test nng
-        run: ctest --output-on-failure
+        run: ctest --output-on-failure -C "Release"
         working-directory: build
+      - name: Create Artifact For nng
+        run: |
+          mkdir -p nng-macos
+          cp build/libnng.so nng-macos
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: nng-macos
           path: |
-            build/libnng.a
-            include/
+            nng-macos/
   build_and_upload_artifact_for_windows:
     runs-on: windows-latest
     steps:
