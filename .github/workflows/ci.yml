@@ -87,8 +87,8 @@ jobs:
           brew install ninja
       - name: Download mbedtls Macos Release
         run: |
-          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.0.9/mbedtls-macos.tar.gz
-          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.0.9/mbedtls-headers.tar.gz
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-macos.tar.gz
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-headers.tar.gz
       - name: Extract mbedtls
         run: |
           mkdir -p /tmp/mbedtls
