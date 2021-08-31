@@ -13,21 +13,9 @@ jobs:
         run: |
           sudo apt-get install -y ninja-build
       - name: Download mbedtls Linux Release
-        uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          repo: "ilkerhalil/mbedtls"
-          version: "tags/v3.0.9"
-          file: "mbedtls-linux.tar.gz"
-          target: "mbedtls-linux.tar.gz"
-          token: ${{ github.token }}
-      - name: Download mbedtls Headers
-        uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          repo: "ilkerhalil/mbedtls"
-          version: "tags/v3.0.9"
-          file: "mbedtls-headers.tar.gz"
-          target: "mbedtls-headers.tar.gz"
-          token: ${{ github.token }}
+        run: |
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.0.9/mbedtls-linux.tar.gz
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.0.9/mbedtls-headers.tar.gz
       - name: Extract mbedtls
         run: |
           mkdir -p /tmp/mbedtls
@@ -97,22 +85,10 @@ jobs:
       - name: Install Dependencies for macos
         run: |
           brew install ninja
-      - name: Download mbedtls Linux Release
-        uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          repo: "ilkerhalil/mbedtls"
-          version: "tags/v3.0.9"
-          file: "mbedtls-macos.tar.gz"
-          target: "mbedtls-macos.tar.gz"
-          token: ${{ github.token }}
-      - name: Download mbedtls Headers
-        uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          repo: "ilkerhalil/mbedtls"
-          version: "tags/v3.0.9"
-          file: "mbedtls-headers.tar.gz"
-          target: "mbedtls-headers.tar.gz"
-          token: ${{ github.token }}
+      - name: Download mbedtls Macos Release
+        run: |
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.0.9/mbedtls-macos.tar.gz
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.0.9/mbedtls-headers.tar.gz
       - name: Extract mbedtls
         run: |
           mkdir -p /tmp/mbedtls
