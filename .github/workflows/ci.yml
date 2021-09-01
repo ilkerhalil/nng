@@ -150,25 +150,48 @@ jobs:
           name: nng-macos
           path: |
             nng-macos/
-  build_and_upload_artifact_for_windows:
+  build_and_upload_artifact_for_windows_with_tls:
+    name: Build and Upload Artifact for macos with tls
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2
-      - name: Build nng
+      - name: Download mbedtls Win54 Release
         shell: bash
         run: |
-          cmake -B build
-          cmake --build build
-      - name: Test nng
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-win.tar.gz
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-headers.tar.gz
+      - name: Extract mbedtls
+        shell: bash
         run: |
-          ctest -C Debug --output-on-failure
+          mkdir -p mbedtls
+          tar -xvf mbedtls-headers.tar.gz -C mbedtls
+          tar -xvf mbedtls-linux.tar.gz -C mbedtls
+      - name: Build nng with tls
+        run: |
+          mkdir build
+          cd build
+          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON \
+          -DNNG_ENABLE_TLS=ON \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DNNG_ELIDE_DEPRECATED=ON \
+          -DNNG_TOOLS=OFF \
+          -DMBEDTLS_ROOT_DIR=${{GITHUB_WORKSPACE}}/mbedtls \
+          ..
+          cmake --build . --config Release
+      - name: Test nng with tls
+        run: |
+          ctest --output-on-failure -C "Release"
         working-directory: build
+      - name: Create Artifact For nng
+        run: |
+          mkdir -p nng-win64
+          cp build/*.dll nng-win64
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: nng-win
           path: |
-            build/Debug/nng.lib
+            nng-win64
             include/
