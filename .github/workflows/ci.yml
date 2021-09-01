@@ -177,7 +177,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DNNG_ELIDE_DEPRECATED=ON \
           -DNNG_TOOLS=OFF \
-          -DMBEDTLS_ROOT_DIR=${{GITHUB_WORKSPACE}}/mbedtls \
+          -DMBEDTLS_ROOT_DIR=${{ github.workspace }}/mbedtls \
           ..
           cmake --build . --config Release
       - name: Test nng with tls
