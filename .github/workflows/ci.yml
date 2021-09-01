@@ -157,13 +157,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2
-      - name: Download mbedtls Win54 Release
-        shell: bash
+      - name: Download mbedtls Windows Release
         run: |
           wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-win.tar.gz
           wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-headers.tar.gz
       - name: Extract mbedtls
-        shell: bash
         run: |
           mkdir -p mbedtls
           tar -xvf mbedtls-headers.tar.gz -C mbedtls
