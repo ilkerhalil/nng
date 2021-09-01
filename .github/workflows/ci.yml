@@ -112,7 +112,7 @@ jobs:
       - name: Create Artifact For nng with tls
         run: |
           mkdir -p nng-macos
-          cp build/libnng.so nng-macos
+          cp build/libnng.dylib nng-macos
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -143,7 +143,7 @@ jobs:
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-macos
-          cp build/libnng.so nng-macos
+          cp build/libnng.dylib nng-macos
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -171,7 +171,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON -DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF -DMBEDTLS_ROOT_DIR=D:\a\nng\nng\mbedtls ..
+          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON -DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF -DMBEDTLS_ROOT_DIR=D:/a/nng/nng/mbedtls ..
           cmake --build . --config Release
       - name: Test nng with tls
         run: |
