@@ -171,13 +171,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON \
-          -DNNG_ENABLE_TLS=ON \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DNNG_ELIDE_DEPRECATED=ON \
-          -DNNG_TOOLS=OFF \
-          -DMBEDTLS_ROOT_DIR=${{ github.workspace }}/mbedtls \
-          ..
+          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON -DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF -DMBEDTLS_ROOT_DIR=${{ github.workspace }}/mbedtls ..
           cmake --build . --config Release
       - name: Test nng with tls
         run: |
