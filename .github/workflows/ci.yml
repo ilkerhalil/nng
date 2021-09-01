@@ -162,16 +162,16 @@ jobs:
           Invoke-WebRequest https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-win.tar.gz -OutFile mbedtls-win.tar.gz
           Invoke-WebRequest https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-headers.tar.gz -OutFile mbedtls-headers.tar.gz
       - name: Extract mbedtls
-        shell: bash
         run: |
           mkdir -p mbedtls
-          tar -xvf mbedtls-headers.tar.gz -C mbedtls
-          tar -xvf mbedtls-win.tar.gz -C mbedtls
+          tar -xvf mbedtls-headers.tar.gz -C ${{ github.workspace }}/mbedtls
+          tar -xvf mbedtls-win.tar.gz -C ${{ github.workspace }}/mbedtls
+          ls ${{ github.workspace }}/mbedtls
       - name: Build nng with tls
         run: |
           mkdir build
           cd build
-          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON -DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF -DMBEDTLS_ROOT_DIR=D:/a/nng/nng/mbedtls ..
+          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON -DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF -DMBEDTLS_ROOT_DIR=${{ github.workspace }}/mbedtls ..
           cmake --build . --config Release
       - name: Test nng with tls
         run: |
