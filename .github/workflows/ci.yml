@@ -171,7 +171,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DBUILD_SHARED_LIBS=ON -DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF -DMBEDTLS_ROOT_DIR=${{ github.workspace }}/mbedtls ..
+          cmake -DBUILD_SHARED_LIBS=ON -DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF -DMBEDTLS_TLS_LIBRARY=${{ github.workspace }}/mbedtls.dll -DMBEDTLS_CRYPTO_LIBRARY=${{ github.workspace }}/mbedcrypto.dll -DMBEDTLS_X509_LIBRARY=${{ github.workspace }}/mbedx509.dll -DMBEDTLS_INCLUDE_DIR=${{ github.workspace }}/include ..
           cmake --build . --config Release
       - name: Test nng with tls
         run: |
