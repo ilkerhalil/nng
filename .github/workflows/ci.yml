@@ -199,14 +199,14 @@ jobs:
       - uses: actions/checkout@v2
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2
-      - name: Build nng with tls
+      - name: Build nng
         run: |
           mkdir build
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF  ..
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF  ..
           cmake --build . --config Release
-      - name: Test nng with tls
+      - name: Test nng
         run: |
           ctest --output-on-failure -C "Release"
         working-directory: build
