@@ -58,10 +58,11 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON \
-          -DCMAKE_BUILD_TYPE=Release \
+          cmake -G "Unix Makefiles" \
+          -DBUILD_SHARED_LIBS=ON \
           -DNNG_ELIDE_DEPRECATED=ON \
           -DNNG_TOOLS=OFF \
+          -DCMAKE_BUILD_TYPE=Release \
           ..
           cmake --build . --config Release
       - name: Test nng
@@ -100,6 +101,9 @@ jobs:
           cd build
           cmake -G "Unix Makefiles" \
           -DBUILD_SHARED_LIBS=ON \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DNNG_ELIDE_DEPRECATED=ON \
+          -DNNG_TOOLS=OFF \
           -DNNG_ENABLE_TLS=ON \
           -DCMAKE_BUILD_TYPE=Release \
           -DMBEDTLS_ROOT_DIR=/tmp/mbedtls \
@@ -131,8 +135,10 @@ jobs:
           mkdir build
           cd build
           cmake -G "Unix Makefiles" \
-          -DBUILD_SHARED_LIBS=ON \
           -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_SHARED_LIBS=ON  \
+          -DNNG_ELIDE_DEPRECATED=ON \
+          -DNNG_TOOLS=OFF \
           ..
           cmake --build . --config Release
       - name: Test nng
@@ -169,7 +175,36 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DBUILD_SHARED_LIBS=ON-DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DMBEDTLS_ROOT_DIR=${{ github.workspace }}\mbedtls  ..
+          cmake -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF -DBUILD_SHARED_LIBS=ON -DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DMBEDTLS_ROOT_DIR=${{ github.workspace }}\mbedtls  ..
+          cmake --build . --config Release
+      - name: Test nng with tls
+        run: |
+          ctest --output-on-failure -C "Release"
+        working-directory: build
+      - name: Create Artifact For nng
+        run: |
+          mkdir -p nng-win64
+          cp build/*.dll nng-win64
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: nng-win-with-tls
+          path: |
+            nng-win64
+            include/
+  build_and_upload_artifact_for_windows:
+    name: Build and Upload Artifact for windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Build nng with tls
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF  ..
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF  ..
           cmake --build . --config Release
       - name: Test nng with tls
         run: |
