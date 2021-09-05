@@ -14,8 +14,8 @@ jobs:
           sudo apt-get install -y ninja-build
       - name: Download mbedtls Linux Release
         run: |
-          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.0.9/mbedtls-linux.tar.gz
-          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.0.9/mbedtls-headers.tar.gz
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.2.0/mbedtls-linux.tar.gz
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.2.0/mbedtls-headers.tar.gz
       - name: Extract mbedtls
         run: |
           mkdir -p /tmp/mbedtls
@@ -87,8 +87,8 @@ jobs:
           brew install ninja
       - name: Download mbedtls Macos Release
         run: |
-          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-macos.tar.gz
-          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-headers.tar.gz
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.2.0/mbedtls-macos.tar.gz
+          wget https://github.com/ilkerhalil/mbedtls/releases/download/v3.2.0/mbedtls-headers.tar.gz
       - name: Extract mbedtls
         run: |
           mkdir -p /tmp/mbedtls
@@ -98,11 +98,10 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON \
+          cmake -G "Unix Makefiles" \
+          -DBUILD_SHARED_LIBS=ON \
           -DNNG_ENABLE_TLS=ON \
           -DCMAKE_BUILD_TYPE=Release \
-          -DNNG_ELIDE_DEPRECATED=ON \
-          -DNNG_TOOLS=OFF \
           -DMBEDTLS_ROOT_DIR=/tmp/mbedtls \
           ..
           cmake --build . --config Release
@@ -131,10 +130,9 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON \
+          cmake -G "Unix Makefiles" \
+          -DBUILD_SHARED_LIBS=ON \
           -DCMAKE_BUILD_TYPE=Release \
-          -DNNG_ELIDE_DEPRECATED=ON \
-          -DNNG_TOOLS=OFF \
           ..
           cmake --build . --config Release
       - name: Test nng
@@ -159,8 +157,8 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Download mbedtls Windows Release
         run: |
-          Invoke-WebRequest https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-win.tar.gz -OutFile mbedtls-win.tar.gz
-          Invoke-WebRequest https://github.com/ilkerhalil/mbedtls/releases/download/v3.1.0/mbedtls-headers.tar.gz -OutFile mbedtls-headers.tar.gz
+          Invoke-WebRequest https://github.com/ilkerhalil/mbedtls/releases/download/v3.2.0/mbedtls-win.tar.gz -OutFile mbedtls-win.tar.gz
+          Invoke-WebRequest https://github.com/ilkerhalil/mbedtls/releases/download/v3.2.0/mbedtls-headers.tar.gz -OutFile mbedtls-headers.tar.gz
       - name: Extract mbedtls
         run: |
           mkdir -p mbedtls
@@ -171,7 +169,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DBUILD_SHARED_LIBS=ON -DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF -DMBEDTLS_TLS_LIBRARY=${{ github.workspace }}/mbedtls.dll -DMBEDTLS_CRYPTO_LIBRARY=${{ github.workspace }}/mbedcrypto.dll -DMBEDTLS_X509_LIBRARY=${{ github.workspace }}/mbedx509.dll -DMBEDTLS_INCLUDE_DIR=${{ github.workspace }}/include ..
+          cmake -DBUILD_SHARED_LIBS=ON-DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DMBEDTLS_ROOT_DIR=${{ github.workspace }}/mbedtls  .
           cmake --build . --config Release
       - name: Test nng with tls
         run: |
