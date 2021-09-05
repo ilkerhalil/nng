@@ -169,7 +169,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DBUILD_SHARED_LIBS=ON-DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DMBEDTLS_ROOT_DIR=${{ github.workspace }}/mbedtls  .
+          cmake -DBUILD_SHARED_LIBS=ON-DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DMBEDTLS_ROOT_DIR=${{ github.workspace }}\mbedtls  ..
           cmake --build . --config Release
       - name: Test nng with tls
         run: |
