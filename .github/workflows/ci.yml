@@ -33,9 +33,9 @@ jobs:
           -DMBEDTLS_ROOT_DIR=/tmp/mbedtls \
           ..
           cmake --build . --config Release
-      - name: Test nng with tls
-        run: ctest --output-on-failure -C "Release"
-        working-directory: build
+      # - name: Test nng with tls
+      #   run: ctest --output-on-failure -C "Release"
+      #   working-directory: build
       - name: Create Artifact For nng with tls
         run: |
           mkdir -p nng-linux
@@ -65,9 +65,9 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           ..
           cmake --build . --config Release
-      - name: Test nng
-        run: ctest --output-on-failure -C "Release"
-        working-directory: build
+      # - name: Test nng
+      #   run: ctest --output-on-failure -C "Release"
+      #   working-directory: build
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-linux
@@ -109,9 +109,9 @@ jobs:
           -DMBEDTLS_ROOT_DIR=/tmp/mbedtls \
           ..
           cmake --build . --config Release
-      - name: Test nng with tls
-        run: ctest --output-on-failure -C "Release"
-        working-directory: build
+      # - name: Test nng with tls
+      #   run: ctest --output-on-failure -C "Release"
+      #  working-directory: build
       - name: Create Artifact For nng with tls
         run: |
           mkdir -p nng-macos
@@ -141,9 +141,9 @@ jobs:
           -DNNG_TOOLS=OFF \
           ..
           cmake --build . --config Release
-      - name: Test nng
-        run: ctest --output-on-failure -C "Release"
-        working-directory: build
+      # - name: Test nng
+      #   run: ctest --output-on-failure -C "Release"
+      #   working-directory: build
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-macos
@@ -177,10 +177,10 @@ jobs:
           cd build
           cmake -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF -DBUILD_SHARED_LIBS=ON -DNNG_ENABLE_TLS=ON -DCMAKE_BUILD_TYPE=Release -DMBEDTLS_ROOT_DIR=${{ github.workspace }}\mbedtls  ..
           cmake --build . --config Release
-      - name: Test nng with tls
-        run: |
-          ctest -C Release --output-on-failure
-        working-directory: build
+      # - name: Test nng with tls
+      #   run: |
+      #     ctest -C Release --output-on-failure
+      #  working-directory: build
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-win64
@@ -203,12 +203,12 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON ..
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF  ..
           cmake --build . --config Release
-      - name: Test nng
-        run: |
-          ctest -C Release --output-on-failure
-        working-directory: build
+      # - name: Test nng
+      #   run: |
+      #     ctest -C Release --output-on-failure
+      #  working-directory: build
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-win64
