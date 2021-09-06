@@ -208,7 +208,7 @@ jobs:
           cmake --build .
       - name: Test nng
         run: |
-          ctest --output-on-failure
+          ctest --output-on-failure -C Debug
         working-directory: build
       - name: Create Artifact For nng
         run: |
