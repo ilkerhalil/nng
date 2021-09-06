@@ -179,7 +179,7 @@ jobs:
           cmake --build . --config Release
       - name: Test nng with tls
         run: |
-          ctest --output-on-failure -C "Release"
+          ctest -C Release --output-on-failure
         working-directory: build
       - name: Create Artifact For nng
         run: |
@@ -205,10 +205,10 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF  ..
           cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DNNG_ELIDE_DEPRECATED=ON -DNNG_TOOLS=OFF  ..
-          cmake --build .
+          cmake --build . --config Release
       - name: Test nng
         run: |
-          ctest --output-on-failure -C Debug
+          ctest -C Release --output-on-failure
         working-directory: build
       - name: Create Artifact For nng
         run: |
