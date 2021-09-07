@@ -39,13 +39,14 @@ jobs:
       - name: Create Artifact For nng with tls
         run: |
           mkdir -p nng-linux
-          cp build/*.so nng-linux
+          cp build/libnng.so* nng-linux
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: nng-linux-with-tls
           path: |
             nng-linux/
+            include/
   build_and_upload_artifact_for_linux:
     name: Build and Upload Artifact for linux
     runs-on: ubuntu-latest
@@ -71,13 +72,14 @@ jobs:
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-linux
-          cp build/*.so nng-linux
+          cp build/libnng.so* nng-linux
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: nng-linux
           path: |
             nng-linux/
+            include/
   build_and_upload_artifact_for_macos_with_tls:
     name: Build and Upload Artifact for macos with tls
     runs-on: macos-latest
@@ -115,6 +117,7 @@ jobs:
       - name: Create Artifact For nng with tls
         run: |
           mkdir -p nng-macos
+          ls build/
           cp build/*.dylib nng-macos
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
@@ -122,6 +125,7 @@ jobs:
           name: nng-macos-with-tls
           path: |
             nng-macos/
+            include/
   build_and_upload_artifact_for_macos:
     name: Build and Upload Artifact for macos
     runs-on: macos-latest
@@ -147,6 +151,7 @@ jobs:
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-macos
+          ls build/
           cp build/*.dylib nng-macos
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
@@ -154,6 +159,7 @@ jobs:
           name: nng-macos
           path: |
             nng-macos/
+            include/
   build_and_upload_artifact_for_windows_with_tls:
     name: Build and Upload Artifact for windows with tls
     runs-on: windows-latest
@@ -184,7 +190,8 @@ jobs:
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-win64
-          cp build/*.dll nng-win64
+          cp build/nng.lib nng-win64
+          cp build/nng.dll nng-win64
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -212,7 +219,8 @@ jobs:
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-win64
-          cp build/*.dll nng-win64
+          cp build/nng.lib nng-win64
+          cp build/nng.dll nng-win64
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
