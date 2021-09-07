@@ -190,8 +190,8 @@ jobs:
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-win64
-          cp build/nng.lib nng-win64
-          cp build/nng.dll nng-win64
+          cp build/Release/nng.lib nng-win64
+          cp build/Release/nng.dll nng-win64
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -219,8 +219,8 @@ jobs:
       - name: Create Artifact For nng
         run: |
           mkdir -p nng-win64
-          cp build/nng.lib nng-win64
-          cp build/nng.dll nng-win64
+          cp build/Release/nng.lib nng-win64
+          cp build/Release/nng.dll nng-win64
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
