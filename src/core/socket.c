@@ -608,7 +608,7 @@ nni_sock_create(nni_sock **sp, const nni_proto *proto)
 	return (rv);
 }
 
-int
+void
 nni_sock_sys_init(void)
 {
 	NNI_LIST_INIT(&sock_list, nni_sock, s_node);
@@ -617,7 +617,6 @@ nni_sock_sys_init(void)
 	nni_id_map_init(&sock_ids, 1, 0x7fffffff, false);
 	nni_id_map_init(&ctx_ids, 1, 0x7fffffff, false);
 	inited = true;
-	return (0);
 }
 
 void
@@ -1490,9 +1489,7 @@ nni_dialer_add_pipe(nni_dialer *d, void *tpipe)
 
 	nni_pipe_run_cb(p, NNG_PIPE_EV_ADD_PRE);
 
-	nni_mtx_lock(&s->s_mx);
-	if (p->p_closed) {
-		nni_mtx_unlock(&s->s_mx);
+	if (nni_pipe_is_closed(p)) {
 #ifdef NNG_ENABLE_STATS
 		nni_stat_inc(&d->st_reject, 1);
 		nni_stat_inc(&s->st_rejects, 1);
@@ -1500,8 +1497,8 @@ nni_dialer_add_pipe(nni_dialer *d, void *tpipe)
 		nni_pipe_rele(p);
 		return;
 	}
+
 	if (p->p_proto_ops.pipe_start(p->p_proto_data) != 0) {
-		nni_mtx_unlock(&s->s_mx);
 #ifdef NNG_ENABLE_STATS
 		nni_stat_inc(&d->st_reject, 1);
 		nni_stat_inc(&s->st_rejects, 1);
@@ -1510,7 +1507,6 @@ nni_dialer_add_pipe(nni_dialer *d, void *tpipe)
 		nni_pipe_rele(p);
 		return;
 	}
-	nni_mtx_unlock(&s->s_mx);
 #ifdef NNG_ENABLE_STATS
 	nni_stat_register(&p->st_root);
 #endif
@@ -1605,9 +1601,7 @@ nni_listener_add_pipe(nni_listener *l, void *tpipe)
 
 	nni_pipe_run_cb(p, NNG_PIPE_EV_ADD_PRE);
 
-	nni_mtx_lock(&s->s_mx);
-	if (p->p_closed) {
-		nni_mtx_unlock(&s->s_mx);
+	if (nni_pipe_is_closed(p)) {
 #ifdef NNG_ENABLE_STATS
 		nni_stat_inc(&l->st_reject, 1);
 		nni_stat_inc(&s->st_rejects, 1);
@@ -1616,7 +1610,6 @@ nni_listener_add_pipe(nni_listener *l, void *tpipe)
 		return;
 	}
 	if (p->p_proto_ops.pipe_start(p->p_proto_data) != 0) {
-		nni_mtx_unlock(&s->s_mx);
 #ifdef NNG_ENABLE_STATS
 		nni_stat_inc(&l->st_reject, 1);
 		nni_stat_inc(&s->st_rejects, 1);
@@ -1625,7 +1618,6 @@ nni_listener_add_pipe(nni_listener *l, void *tpipe)
 		nni_pipe_rele(p);
 		return;
 	}
-	nni_mtx_unlock(&s->s_mx);
 #ifdef NNG_ENABLE_STATS
 	nni_stat_register(&p->st_root);
 #endif
