@@ -55,13 +55,11 @@ void
 nni_plat_mtx_init(nni_plat_mtx *mtx)
 {
 	InitializeSRWLock(&mtx->srl);
-	mtx->init = 1;
 }
 
 void
 nni_plat_mtx_fini(nni_plat_mtx *mtx)
 {
-	mtx->init = 0;
 }
 
 void
@@ -221,6 +219,18 @@ void
 nni_atomic_set64(nni_atomic_u64 *v, uint64_t u)
 {
 	(void) InterlockedExchange64(&v->v, (LONGLONG) u);
+}
+
+void *
+nni_atomic_get_ptr(nni_atomic_ptr *v)
+{
+	return ((void *) (InterlockedExchangeAdd64(&v->v, 0)));
+}
+
+void
+nni_atomic_set_ptr(nni_atomic_ptr *v)
+{
+	(void) InterlockedExchange64(&v->v, (LONGLONG) (uintptr_t) v);
 }
 
 uint64_t
