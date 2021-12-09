@@ -58,13 +58,19 @@ struct nni_plat_mtx {
 	pthread_mutex_t mtx;
 };
 
-#define NNI_MTX_INITIALIZER { PTHREAD_MUTEX_INITIALIZER }
+#define NNI_MTX_INITIALIZER               \
+	{                                 \
+		PTHREAD_MUTEX_INITIALIZER \
+	}
 
 struct nni_rwlock {
 	pthread_rwlock_t rwl;
 };
 
-#define NNI_RWLOCK_INITIALIZER { PTHREAD_RWLOCK_INITIALIZER }
+#define NNI_RWLOCK_INITIALIZER             \
+	{                                  \
+		PTHREAD_RWLOCK_INITIALIZER \
+	}
 
 // No static form of CV initialization because of the need to use
 // attributes to set the clock type.
@@ -72,6 +78,14 @@ struct nni_plat_cv {
 	pthread_cond_t cv;
 	nni_plat_mtx  *mtx;
 };
+
+// NOTE: condition variables initialized with this should *NOT*
+// be used with nni_cv_until -- the clock attributes are not passed
+// and the wake-up times will not be correct.
+#define NNI_CV_INITIALIZER(mxp)                            \
+	{                                                  \
+		.mtx = mxp, .cv = PTHREAD_COND_INITIALIZER \
+	}
 
 struct nni_plat_thr {
 	pthread_t tid;
@@ -86,7 +100,6 @@ struct nni_plat_flock {
 #define NNG_PLATFORM_DIR_SEP "/"
 
 #ifdef NNG_HAVE_STDATOMIC
-
 #include <stdatomic.h>
 
 struct nni_atomic_flag {
