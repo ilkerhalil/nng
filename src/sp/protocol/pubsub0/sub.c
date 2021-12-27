@@ -1,5 +1,5 @@
 //
-// Copyright 2020 Staysail Systems, Inc. <info@staysail.tech>
+// Copyright 2021 Staysail Systems, Inc. <info@staysail.tech>
 // Copyright 2018 Capitar IT Group BV <info@capitar.com>
 // Copyright 2019 Nathan Kent <nate@nkent.net>
 //
@@ -27,7 +27,7 @@
 #define NNI_PROTO_PUB_V0 NNI_PROTO(2, 0)
 #endif
 
-// By default we accept 128 messages.
+// By default, we accept 128 messages.
 #define SUB0_DEFAULT_RECV_BUF_LEN 128
 
 // By default, prefer new messages when the queue is full.
@@ -115,7 +115,7 @@ again:
 		return;
 	}
 
-	(void) nni_lmq_getq(&ctx->lmq, &msg);
+	(void) nni_lmq_get(&ctx->lmq, &msg);
 
 	if (nni_lmq_empty(&ctx->lmq) && (ctx == &sock->master)) {
 		nni_pollable_clear(&sock->readable);
@@ -175,22 +175,19 @@ sub0_ctx_fini(void *arg)
 	nni_lmq_fini(&ctx->lmq);
 }
 
-static int
+static void
 sub0_ctx_init(void *ctx_arg, void *sock_arg)
 {
 	sub0_sock *sock = sock_arg;
 	sub0_ctx * ctx  = ctx_arg;
 	size_t     len;
 	bool       prefer_new;
-	int        rv;
 
 	nni_mtx_lock(&sock->lk);
 	len        = sock->recv_buf_len;
 	prefer_new = sock->prefer_new;
 
-	if ((rv = nni_lmq_init(&ctx->lmq, len)) != 0) {
-		return (rv);
-	}
+	nni_lmq_init(&ctx->lmq, len);
 	ctx->prefer_new = prefer_new;
 
 	nni_aio_list_init(&ctx->recv_queue);
@@ -201,8 +198,6 @@ sub0_ctx_init(void *ctx_arg, void *sock_arg)
 	nni_list_append(&sock->contexts, ctx);
 	sock->num_contexts++;
 	nni_mtx_unlock(&sock->lk);
-
-	return (0);
 }
 
 static void
@@ -215,11 +210,10 @@ sub0_sock_fini(void *arg)
 	nni_mtx_fini(&sock->lk);
 }
 
-static int
+static void
 sub0_sock_init(void *arg, nni_sock *unused)
 {
 	sub0_sock *sock = arg;
-	int        rv;
 
 	NNI_ARG_UNUSED(unused);
 
@@ -229,12 +223,7 @@ sub0_sock_init(void *arg, nni_sock *unused)
 	sock->prefer_new   = SUB0_DEFAULT_PREFER_NEW;
 	nni_pollable_init(&sock->readable);
 
-	if ((rv = sub0_ctx_init(&sock->master, sock)) != 0) {
-		sub0_sock_fini(sock);
-		return (rv);
-	}
-
-	return (0);
+	sub0_ctx_init(&sock->master, sock);
 }
 
 static void
@@ -385,14 +374,14 @@ sub0_recv_cb(void *arg)
 		} else if (nni_lmq_full(&ctx->lmq)) {
 			// Make space for the new message.
 			nni_msg *old;
-			(void) nni_lmq_getq(&ctx->lmq, &old);
+			(void) nni_lmq_get(&ctx->lmq, &old);
 			nni_msg_free(old);
 
-			(void) nni_lmq_putq(&ctx->lmq, dup_msg);
+			(void) nni_lmq_put(&ctx->lmq, dup_msg);
 			queued = true;
 
 		} else {
-			(void) nni_lmq_putq(&ctx->lmq, dup_msg);
+			(void) nni_lmq_put(&ctx->lmq, dup_msg);
 			queued = true;
 		}
 		if (queued && ctx == &sock->master) {
@@ -459,7 +448,7 @@ sub0_ctx_set_recv_buf_len(void *arg, const void *buf, size_t sz, nni_type t)
 	return (0);
 }
 
-// For now we maintain subscriptions on a sorted linked list.  As we do not
+// For now, we maintain subscriptions on a sorted linked list.  As we do not
 // expect to have huge numbers of subscriptions, and as the operation is
 // really O(n), we think this is acceptable.  In the future we might decide
 // to replace this with a patricia trie, like old nanomsg had.
@@ -534,9 +523,9 @@ sub0_ctx_unsubscribe(void *arg, const void *buf, size_t sz, nni_type t)
 	for (size_t i = 0; i < len; i++) {
 		nni_msg *msg;
 
-		(void) nni_lmq_getq(&ctx->lmq, &msg);
+		(void) nni_lmq_get(&ctx->lmq, &msg);
 		if (sub0_matches(ctx, nni_msg_body(msg), nni_msg_len(msg))) {
-			(void) nni_lmq_putq(&ctx->lmq, msg);
+			(void) nni_lmq_put(&ctx->lmq, msg);
 		} else {
 			nni_msg_free(msg);
 		}

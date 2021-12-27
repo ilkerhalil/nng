@@ -51,7 +51,7 @@ struct push0_pipe {
 	nni_aio aio_send;
 };
 
-static int
+static void
 push0_sock_init(void *arg, nni_sock *sock)
 {
 	push0_sock *s = arg;
@@ -62,8 +62,6 @@ push0_sock_init(void *arg, nni_sock *sock)
 	NNI_LIST_INIT(&s->pl, push0_pipe, node);
 	nni_lmq_init(&s->wq, 0); // initially we start unbuffered.
 	nni_pollable_init(&s->writable);
-
-	return (0);
 }
 
 static void
@@ -193,7 +191,7 @@ push0_pipe_ready(push0_pipe *p)
 
 	// if  message is waiting in the buffered queue
 	// then we prefer that.
-	if (nni_lmq_getq(&s->wq, &m) == 0) {
+	if (nni_lmq_get(&s->wq, &m) == 0) {
 		nni_aio_set_msg(&p->aio_send, m);
 		nni_pipe_send(p->pipe, &p->aio_send);
 
@@ -201,7 +199,7 @@ push0_pipe_ready(push0_pipe *p)
 			nni_aio_list_remove(a);
 			m = nni_aio_get_msg(a);
 			l = nni_msg_len(m);
-			nni_lmq_putq(&s->wq, m);
+			nni_lmq_put(&s->wq, m);
 		}
 
 	} else if ((a = nni_list_first(&s->aq)) != NULL) {
@@ -299,8 +297,8 @@ push0_sock_send(void *arg, nni_aio *aio)
 		return;
 	}
 
-	// Can we maybe queue it.
-	if (nni_lmq_putq(&s->wq, m) == 0) {
+	// Can we queue it?
+	if (nni_lmq_put(&s->wq, m) == 0) {
 		// Yay, we can.  So we're done.
 		nni_aio_set_msg(aio, NULL);
 		nni_aio_finish(aio, 0, l);
